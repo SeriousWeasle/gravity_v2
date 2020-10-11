@@ -7,9 +7,9 @@ import time
 from colorama import Fore, Back, Style
 
 #global variables
-dt = 0.1              #timestep size
+dt = 0.05              #timestep size
 G = 6.67408e-11     #gravitational constant
-framecount = 25000
+framecount = 100000
 
 #root for higher power numbers
 def powroot(num, pow):
@@ -149,15 +149,15 @@ class simulationhandler:
             o.tick()
 
     def drawframe(self, fn):
-        frame = Image.new("RGB", (4096 , 4096), "black")
-        offset = vector2(2048, 2048)
+        frame = Image.new("RGB", (16384, 16384), "black")
+        offset = vector2(8192, 8192)
         framedraw = ImageDraw.Draw(frame)
         for o in self.objs:
             bl_x = int(offset.x() + o.p.x() - o.r)
             bl_y = int(offset.y() + o.p.y() - o.r)
             tr_x = int(offset.x() + o.p.x() + o.r)
             tr_y = int(offset.y() + o.p.y() + o.r)
-            if bl_x > 0 and bl_x < 4096 and bl_y > 0 and bl_y < 4096 and tr_x > 0 and tr_x < 4096 and tr_y > 0 and tr_y < 4096:
+            if bl_x > 0 and bl_x < 16384 and bl_y > 0 and bl_y < 16384 and tr_x > 0 and tr_x < 16384 and tr_y > 0 and tr_y < 16384:
                 framedraw.ellipse([(bl_x, bl_y), (tr_x, tr_y)], fill=(o.c.r(), o.c.g(), o.c.b()), outline=(o.c.r(), o.c.g(), o.c.b()))
         frame.save("./frames/" + str(fn) + ".png")
 
@@ -179,7 +179,7 @@ class simulationhandler:
         self.advancetime()
         self.drawframe(fn)
 
-sim = simulationhandler(4096, 0.1, 1000, 1, 1, -2048, 2048, -2048, 2048)
+sim = simulationhandler(8192, 1, 10000, 1, 1, -8192, 8192, -8192, 8192)
 sim.addStartForce(0, 1000)
 for i in range(framecount):
     sim.tick(i)
