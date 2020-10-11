@@ -7,8 +7,9 @@ import time
 from colorama import Fore, Back, Style
 
 #global variables
-dt = 1              #timestep size
+dt = 0.1              #timestep size
 G = 6.67408e-11     #gravitational constant
+framecount = 25000
 
 #root for higher power numbers
 def powroot(num, pow):
@@ -38,6 +39,9 @@ class physobject:
     def tick(self):
         #s = v * t
         self.p += self.v * dt
+    
+    def setspeed(self, speed:vector2):
+        self.v = speed
 
 def addphysobjs(o1:physobject, o2: physobject):
     #calculate new mass
@@ -49,7 +53,9 @@ def addphysobjs(o1:physobject, o2: physobject):
     col = ((o1.c * frac1) + (o2.c * frac2)).toint()
     vel = ((o1.v * o1.m) + (o2.v * o2.m)) / (o1.m + o2.m)
     pos = (o1.p * frac1) + (o2.p * frac2)
-    return physobject(mass, density, col, pos)
+    po = physobject(mass, density, col, pos)
+    po.setspeed(vel)
+    return po
 
 class simulationhandler:
     def __init__(self, objcount, min_sm, max_sm, min_d, max_d, min_x, max_x, min_y, max_y):
@@ -94,10 +100,13 @@ class simulationhandler:
             #add force exerted by every other object to object
             affectedobject.addForce(force)
     
-    def calculatecollisions(self):
+    def calculatecollisions(self, fn):
+        colcount = 0
+        runcount = 0
         #variable for checking if collisions should be recalculated
         runcheck = True
         while runcheck:
+            runcount += 1
             #set to false in the hope of not finding a collision
             runcheck = False
             #list of collided object indexes
@@ -123,11 +132,13 @@ class simulationhandler:
                             collided.append(j)
                             #add combined of both to new objects
                             newobjs.append(addphysobjs(affectedobject, other))
+                            colcount += 1
                 #if the object has not collided, add to new objects
                 if i not in collided:
                     newobjs.append(affectedobject)
             #set new objects as current objects and run collision checker again if needed
             self.objs = newobjs
+        print(Fore.YELLOW + "[" + str(fn+1), "/", str(framecount) + "] Calculated", colcount, "collision(s) in", runcount, "runs")
 
     #move every object 1 tick forward in time
     def advancetime(self):
@@ -156,18 +167,18 @@ class simulationhandler:
 
     #advance time forward by one timestep
     def tick(self, fn):
-        print(Fore.RED + "[" + str(fn),"/", "100000] Start force calculation" + Fore.RESET)
+        print(Fore.RED + "[" + str(fn+1),"/", str(framecount) + "] Start force calculation" + Fore.RESET)
         st = time.time()
         self.calculateforces()
-        print(Fore.GREEN + "[" + str(fn),"/", "100000] calculated forces in", round(time.time() - st, 3), "seconds" + Fore.RESET)
-        print(Fore.MAGENTA + "[" + str(fn),"/", "100000] Start collision calculation" + Fore.RESET)
+        print(Fore.GREEN + "[" + str(fn+1),"/", str(framecount) + "] calculated forces in", round(time.time() - st, 3), "seconds" + Fore.RESET)
+        print(Fore.MAGENTA + "[" + str(fn+1),"/", str(framecount) + "] Start collision calculation" + Fore.RESET)
         st = time.time()
-        self.calculatecollisions()
-        print(Fore.BLUE + "[" + str(fn),"/", "100000] calculated collisions in", round(time.time() - st, 3), "seconds" + Fore.RESET)
+        self.calculatecollisions(fn)
+        print(Fore.BLUE + "[" + str(fn+1),"/", str(framecount) + "] calculated collisions in", round(time.time() - st, 3), "seconds" + Fore.RESET)
         self.advancetime()
         self.drawframe(fn)
 
-sim = simulationhandler(32768, 0.1, 1000, 1, 1, -8192, 8192, -8192, 8192)
-sim.addStartForce(0, 100)
-for i in range(100000):
+sim = simulationhandler(4096, 0.1, 1000, 1, 1, -2048, 2048, -2048, 2048)
+sim.addStartForce(0, 1000)
+for i in range(framecount):
     sim.tick(i)
