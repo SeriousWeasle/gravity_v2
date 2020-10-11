@@ -157,7 +157,7 @@ class simulationhandler:
             bl_y = int(offset.y() + o.p.y() - o.r)
             tr_x = int(offset.x() + o.p.x() + o.r)
             tr_y = int(offset.y() + o.p.y() + o.r)
-            if bl_x > 0 and bl_x < 16384 and bl_y > 0 and bl_y < 16384 and tr_x > 0 and tr_x < 16384 and tr_y > 0 and tr_y < 16384:
+            if bl_x > 0 and bl_x < 4096 and bl_y > 0 and bl_y < 4096 and tr_x > 0 and tr_x < 4096 and tr_y > 0 and tr_y < 4096:
                 framedraw.ellipse([(bl_x, bl_y), (tr_x, tr_y)], fill=(o.c.r(), o.c.g(), o.c.b()), outline=(o.c.r(), o.c.g(), o.c.b()))
         frame.save("./frames/" + str(fn) + ".png")
 
