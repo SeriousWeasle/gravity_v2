@@ -138,7 +138,8 @@ class simulationhandler:
                     newobjs.append(affectedobject)
             #set new objects as current objects and run collision checker again if needed
             self.objs = newobjs
-        print(Fore.YELLOW + "[" + str(fn+1), "/", str(framecount) + "] Calculated", colcount, "collision(s) in", runcount, "runs")
+        print(Fore.YELLOW + "[" + str(fn+1), "/", str(framecount) + "] Calculated", colcount, "collision(s) in", runcount, "run(s)" + Fore.RESET)
+        print(Fore.WHITE + "[" + str(fn+1), "/", str(framecount) + "]", str(len(self.objs)), "objects left" + Fore.RESET)
 
     #move every object 1 tick forward in time
     def advancetime(self):
